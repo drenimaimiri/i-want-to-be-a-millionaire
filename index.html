@@ -1,10 +1,728 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Who Wants to Be a Millionaire</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #001f3f 0%, #000814 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            background: linear-gradient(180deg, #ffd700 0%, #ff8c00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .btn {
+            background: linear-gradient(180deg, #1a5f2a 0%, #0d3d16 100%);
+            border: 3px solid #2ecc40;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            background: linear-gradient(180deg, #2ecc40 0%, #1a5f2a 100%);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(46, 204, 64, 0.5);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(180deg, #4a4a4a 0%, #2d2d2d 100%);
+            border-color: #888;
+        }
+
+        .btn-danger {
+            background: linear-gradient(180deg, #8b0000 0%, #4a0000 100%);
+            border-color: #ff4444;
+        }
+
+        .btn-lifeline {
+            background: linear-gradient(180deg, #0066cc 0%, #003366 100%);
+            border-color: #00aaff;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+
+        .btn-lifeline:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .lifelines-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            max-width: 500px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border: 3px solid #444;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            outline: none;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #ffd700;
+        }
+
+        .question-card {
+            background: linear-gradient(180deg, #001a33 0%, #000d1a 100%);
+            border: 3px solid #0066cc;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .question-number {
+            font-size: 1.2rem;
+            color: #00aaff;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            min-height: 60px;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .answer-btn {
+            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+            border: 2px solid #444;
+            color: white;
+            padding: 15px 20px;
+            font-size: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .answer-btn:hover:not(:disabled) {
+            background: linear-gradient(180deg, #2a2a4e 0%, #1a1a3a 100%);
+            border-color: #ffd700;
+        }
+
+        .answer-btn.correct {
+            background: linear-gradient(180deg, #1a5f2a 0%, #0d3d16 100%);
+            border-color: #2ecc40;
+        }
+
+        .answer-btn.wrong {
+            background: linear-gradient(180deg, #8b0000 0%, #4a0000 100%);
+            border-color: #ff4444;
+        }
+
+        .answer-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .answer-label {
+            display: inline-block;
+            width: 30px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .money-ladder {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 5px;
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .money-level {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .money-level.current {
+            background: linear-gradient(180deg, #ffd700 0%, #ff8c00 100%);
+            color: #000;
+            font-weight: bold;
+        }
+
+        .money-level.passed {
+            color: #2ecc40;
+        }
+
+        .question-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .question-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .question-item:hover {
+            border-color: #ffd700;
+        }
+
+        .question-item.selected {
+            border-color: #2ecc40;
+        }
+
+        .link-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            word-break: break-all;
+        }
+
+        .link-container input {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .result-screen {
+            font-size: 1.5rem;
+        }
+
+        .result-screen .score {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 20px 0;
+        }
+
+        .result-screen .message {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(180deg, #001a33 0%, #000d1a 100%);
+            border: 3px solid #ffd700;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .friend-call {
+            font-style: italic;
+            color: #00aaff;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 170, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .hint-text {
+            color: #2ecc40;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(46, 204, 64, 0.1);
+            border-radius: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            transition: width 0.5s;
+        }
+
+        @media (max-width: 600px) {
+            .answers-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .money-ladder {
+                display: none;
+            }
+            
+            .logo {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    
+    <div class="container">
+        <div class="logo">💰 Who Wants to Be a Millionaire 💰</div>
+
+        <div id="homeScreen" class="screen active">
+            <h2 style="margin-bottom: 20px;">Welcome!</h2>
+            <button class="btn" onclick="showCreator()">Create Your Quiz</button>
+            <button class="btn btn-secondary" onclick="startQuiz()">Play Quiz</button>
+        </div>
+
+        <div id="creatorScreen" class="screen">
+            <h2>Create Your Quiz</h2>
+            <div class="input-group">
+                <label>Number of Questions</label>
+                <input type="number" id="numQuestions" min="1" max="15" value="5" onchange="updateQuestionCount()">
+            </div>
+            <div id="questionsContainer"></div>
+            <button class="btn" onclick="generateLink()">Generate Shareable Link</button>
+            <button class="btn btn-secondary" onclick="showScreen('homeScreen')">Back</button>
+            
+            <div id="linkSection" style="display: none;">
+                <div class="link-container">
+                    <p>Share this link with others:</p>
+                    <input type="text" id="shareLink" readonly>
+                </div>
+                <button class="btn" onclick="copyLink()">Copy Link</button>
+            </div>
+        </div>
+
+        <div id="quizScreen" class="screen">
+            <div class="lifelines-container">
+                <button class="btn btn-lifeline" id="lifeline5050" onclick="use5050()">50:50</button>
+                <button class="btn btn-lifeline" id="lifelineHint" onclick="useHint()">Hint</button>
+                <button class="btn btn-lifeline" id="lifelineCall" onclick="useCallFriend()">Call a Friend</button>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div class="question-card">
+                <div class="question-number" id="questionNumber">Question 1</div>
+                <div class="question-text" id="questionText">Loading...</div>
+                <div class="answers-grid" id="answersGrid"></div>
+            </div>
+        </div>
+
+        <div id="resultScreen" class="screen result-screen">
+            <h2>Quiz Complete!</h2>
+            <div class="score" id="finalScore">$0</div>
+            <div class="message" id="resultMessage">Better luck next time!</div>
+            <button class="btn" onclick="showScreen('homeScreen')">Play Again</button>
+            <button class="btn btn-secondary" onclick="shareResults()">Share Results</button>
+        </div>
+    </div>
+
+    <div id="modal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 id="modalTitle"></h3>
+            <div id="modalBody"></div>
+            <button class="btn" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const PRIZES = [100, 200, 300, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 125000, 250000, 500000, 1000000];
+        
+        let quizData = [];
+        let currentQuestion = 0;
+        let score = 0;
+        let used5050 = false;
+        let usedHint = false;
+        let usedCallFriend = false;
+        let hintAnswer = null;
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function showCreator() {
+            showScreen('creatorScreen');
+            document.getElementById('linkSection').style.display = 'none';
+            updateQuestionCount();
+        }
+
+        function updateQuestionCount() {
+            const count = parseInt(document.getElementById('numQuestions').value);
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < count; i++) {
+                container.innerHTML += `
+                    <div class="question-item" style="margin-top: 20px;">
+                        <h4>Question ${i + 1}</h4>
+                        <div class="input-group">
+                            <label>Question Text</label>
+                            <input type="text" class="question-input" placeholder="Enter question ${i + 1}">
+                        </div>
+                        <div class="input-group">
+                            <label>Correct Answer</label>
+                            <input type="text" class="correct-answer" placeholder="Correct answer">
+                        </div>
+                        <div class="input-group">
+                            <label>Wrong Answers (3)</label>
+                            <input type="text" class="wrong-answer-1" placeholder="Wrong answer 1">
+                            <input type="text" class="wrong-answer-2" placeholder="Wrong answer 2" style="margin-top: 5px;">
+                            <input type="text" class="wrong-answer-3" placeholder="Wrong answer 3" style="margin-top: 5px;">
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function generateLink() {
+            const questions = [];
+            const questionInputs = document.querySelectorAll('.question-item');
+            
+            for (let i = 0; i < questionInputs.length; i++) {
+                const q = questionInputs[i].querySelector('.question-input').value;
+                const correct = questionInputs[i].querySelector('.correct-answer').value;
+                const w1 = questionInputs[i].querySelector('.wrong-answer-1').value;
+                const w2 = questionInputs[i].querySelector('.wrong-answer-2').value;
+                const w3 = questionInputs[i].querySelector('.wrong-answer-3').value;
+                
+                if (!q || !correct || !w1 || !w2 || !w3) {
+                    alert(`Please fill in all fields for Question ${i + 1}`);
+                    return;
+                }
+                
+                const answers = [
+                    { text: correct, correct: true },
+                    { text: w1, correct: false },
+                    { text: w2, correct: false },
+                    { text: w3, correct: false }
+                ];
+                
+                questions.push({
+                    question: q,
+                    answers: shuffleArray(answers)
+                });
+            }
+            
+            quizData = questions;
+            const encoded = btoa(encodeURIComponent(JSON.stringify(quizData)));
+            const link = `${window.location.origin}${window.location.pathname}?quiz=${encoded}`;
+            
+            document.getElementById('shareLink').value = link;
+            document.getElementById('linkSection').style.display = 'block';
+        }
+
+        function copyLink() {
+            const linkInput = document.getElementById('shareLink');
+            linkInput.select();
+            document.execCommand('copy');
+            alert('Link copied to clipboard!');
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function loadQuizFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const quizParam = params.get('quiz');
+            
+            if (quizParam) {
+                try {
+                    quizData = JSON.parse(decodeURIComponent(atob(quizParam)));
+                    return true;
+                } catch (e) {
+                    console.error('Failed to load quiz:', e);
+                }
+            }
+            return false;
+        }
+
+        function startQuiz() {
+            if (!loadQuizFromURL()) {
+                quizData = getDefaultQuiz();
+            }
+            
+            currentQuestion = 0;
+            score = 0;
+            used5050 = false;
+            usedHint = false;
+            usedCallFriend = false;
+            hintAnswer = null;
+            
+            document.getElementById('lifeline5050').disabled = false;
+            document.getElementById('lifelineHint').disabled = false;
+            document.getElementById('lifelineCall').disabled = false;
+            
+            showScreen('quizScreen');
+            displayQuestion();
+        }
+
+        function getDefaultQuiz() {
+            return [
+                {
+                    question: "What is the capital of France?",
+                    answers: [
+                        { text: "London", correct: false },
+                        { text: "Paris", correct: true },
+                        { text: "Berlin", correct: false },
+                        { text: "Madrid", correct: false }
+                    ]
+                },
+                {
+                    question: "Which planet is known as the Red Planet?",
+                    answers: [
+                        { text: "Venus", correct: false },
+                        { text: "Jupiter", correct: false },
+                        { text: "Mars", correct: true },
+                        { text: "Saturn", correct: false }
+                    ]
+                },
+                {
+                    question: "What is 2 + 2?",
+                    answers: [
+                        { text: "3", correct: false },
+                        { text: "4", correct: true },
+                        { text: "5", correct: false },
+                        { text: "6", correct: false }
+                    ]
+                }
+            ];
+        }
+
+        function displayQuestion() {
+            const q = quizData[currentQuestion];
+            document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} of ${quizData.length}`;
+            document.getElementById('questionText').textContent = q.question;
+            document.getElementById('progressFill').style.width = `${((currentQuestion) / quizData.length) * 100}%`;
+            
+            const grid = document.getElementById('answersGrid');
+            grid.innerHTML = '';
+            
+            const labels = ['A', 'B', 'C', 'D'];
+            q.answers.forEach((answer, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.innerHTML = `<span class="answer-label">${labels[index]}</span> ${answer.text}`;
+                btn.onclick = () => selectAnswer(index);
+                btn.dataset.correct = answer.correct;
+                btn.dataset.index = index;
+                grid.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(index) {
+            const buttons = document.querySelectorAll('.answer-btn');
+            const correctIndex = quizData[currentQuestion].answers.findIndex(a => a.correct);
+            
+            buttons.forEach(btn => btn.disabled = true);
+            
+            if (quizData[currentQuestion].answers[index].correct) {
+                buttons[index].classList.add('correct');
+                score = PRIZES[currentQuestion] || score;
+                
+                setTimeout(() => {
+                    currentQuestion++;
+                    if (currentQuestion < quizData.length) {
+                        displayQuestion();
+                    } else {
+                        showResults();
+                    }
+                }, 1500);
+            } else {
+                buttons[index].classList.add('wrong');
+                buttons[correctIndex].classList.add('correct');
+                
+                setTimeout(() => {
+                    showResults();
+                }, 2000);
+            }
+        }
+
+        function use5050() {
+            if (used5050) return;
+            used5050 = true;
+            document.getElementById('lifeline5050').disabled = true;
+            
+            const buttons = Array.from(document.querySelectorAll('.answer-btn'));
+            const correctBtn = buttons.find(btn => btn.dataset.correct === 'true');
+            const wrongBtns = buttons.filter(btn => btn.dataset.correct === 'false');
+            
+            const toRemove = wrongBtns.sort(() => 0.5 - Math.random()).slice(0, 2);
+            toRemove.forEach(btn => {
+                btn.classList.add('disabled');
+                btn.disabled = true;
+            });
+        }
+
+        function useHint() {
+            if (usedHint) return;
+            usedHint = true;
+            document.getElementById('lifelineHint').disabled = true;
+            
+            const correctIndex = quizData[currentQuestion].answers.findIndex(a => a.correct);
+            const correctAnswer = quizData[currentQuestion].answers[correctIndex].text;
+            
+            hintAnswer = correctIndex;
+            
+            document.getElementById('modalTitle').textContent = '💡 Hint';
+            document.getElementById('modalBody').innerHTML = `
+                <div class="hint-text">The answer starts with: "${correctAnswer.charAt(0).toUpperCase()}"</div>
+            `;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function useCallFriend() {
+            if (usedCallFriend) return;
+            usedCallFriend = true;
+            document.getElementById('lifelineCall').disabled = true;
+            
+            const correctIndex = quizData[currentQuestion].answers.findIndex(a => a.correct);
+            const confidence = Math.floor(Math.random() * 30) + 60;
+            
+            const friends = ["John", "Sarah", "Mike", "Emma", "David"];
+            const friend = friends[Math.floor(Math.random() * friends.length)];
+            
+            document.getElementById('modalTitle').textContent = `📞 Call ${friend}`;
+            document.getElementById('modalBody').innerHTML = `
+                <div class="friend-call">
+                    "${friend} says: I'm ${confidence}% sure the answer is 
+                    <strong>${quizData[currentQuestion].answers[correctIndex].text}</strong>!"
+                </div>
+            `;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        function showResults() {
+            showScreen('resultScreen');
+            document.getElementById('finalScore').textContent = `$${score.toLocaleString()}`;
+            
+            const percentage = (score / (PRIZES[quizData.length - 1] || 1000)) * 100;
+            let message;
+            
+            if (percentage === 100) {
+                message = "🎉 MILLIONAIRE! You're a genius! 🎉";
+            } else if (percentage >= 70) {
+                message = "🌟 Amazing job!";
+            } else if (percentage >= 40) {
+                message = "👍 Good effort!";
+            } else if (score > 0) {
+                message = "💪 Keep practicing!";
+            } else {
+                message = "📚 Better luck next time!";
+            }
+            
+            document.getElementById('resultMessage').textContent = message;
+        }
+
+        function shareResults() {
+            const text = `I scored $${score.toLocaleString()} on the Who Wants to Be a Millionaire quiz! Can you beat me?`;
+            if (navigator.share) {
+                navigator.share({ text: text });
+            } else {
+                navigator.clipboard.writeText(text + ' ' + window.location.href);
+                alert('Results copied to clipboard!');
+            }
+        }
+
+        window.onload = function() {
+            if (loadQuizFromURL()) {
+                document.querySelector('#homeScreen .btn:first-child').textContent = 'Play Quiz';
+            }
+        };
+    </script>
 </body>
 </html>
