@@ -1,10 +1,8 @@
-<p style="text-align: center;">
+<p align="middle">
   <img src="https://img.utdstc.com/icon/943/fb4/943fb4a3879d0de46035947a4c592de6a9d082ce7fdf2bf3aa78eafae715f939:200">
 </p>
 
 # Kush Do të Bëhet Milioner
-
-A "Who Wants to Be a Millionaire" style quiz game in Albanian.
 
 ## Tech Stack
 
