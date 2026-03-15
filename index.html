@@ -3,20 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kush Do të Bëhet Milioner</title>
+    <title>Kush do të bëhet milioner</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <canvas id="particles-canvas"></canvas>
     
     <div id="loadingScreen" class="loading-screen">
-        <div class="loading-logo">Kush Do të Bëhet Milioner</div>
+        <div class="loading-logo">Kush do të bëhet milioner</div>
         <div class="loading-spinner"></div>
         <div class="loading-text">Duke ngarkuar...</div>
     </div>
     
     <div class="container">
-        <div class="logo">Kush Do të Bëhet Milioner</div>
+        <div class="logo">
+            <img src="https://img.utdstc.com/icon/943/fb4/943fb4a3879d0de46035947a4c592de6a9d082ce7fdf2bf3aa78eafae715f939:200" alt="milioner kuiz logo">
+            <h1 id="titulli">Kush do të bëhet milioner ?</h1>
+        </div>
 
         <div id="homeScreen" class="screen active">
             <h2 style="margin-bottom: 20px;">Mirë se vini!</h2>
@@ -47,7 +50,7 @@
             <div class="lifelines-container">
                 <button class="btn btn-lifeline" id="lifeline5050" onclick="use5050()">50:50</button>
                 <button class="btn btn-lifeline" id="lifelineHint" onclick="useHint()">Ndihmë</button>
-                <button class="btn btn-lifeline" id="lifelineCall" onclick="useCallFriend()">Thërre Miqun</button>
+                <button class="btn btn-lifeline" id="lifelineCall" onclick="useCallFriend()">Thirre Mikun</button>
             </div>
             
             <div class="timer-container">
@@ -69,8 +72,8 @@
         </div>
 
         <div id="resultScreen" class="screen result-screen">
-            <h2>Kuizi Përfundoi!</h2>
-            <div class="score" id="finalScore">$0</div>
+            <h2>Kuizi përfundoi!</h2>
+            <div class="score" id="finalScore">0</div>
             <div class="message" id="resultMessage">Më shumë fat herën tjetër!</div>
             <button class="btn" onclick="showScreen('homeScreen')">Luaj Përsëri</button>
             <button class="btn btn-secondary" onclick="shareResults()">Ndaje Rezultatin</button>

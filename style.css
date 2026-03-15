@@ -46,7 +46,21 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+    animation: titleGlow 2s ease-in-out infinite alternate;
+}
+
+#titulli {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    letter-spacing: 5px;
+    margin-bottom: 30px;
+    margin-top: 50px;
+    background: linear-gradient(180deg, #ffd700 0%, #ff8c00 50%, #ff4500 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
     animation: titleGlow 2s ease-in-out infinite alternate;
 }
 

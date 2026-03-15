@@ -1,5 +1,3 @@
-const PRIZES = [100, 200, 300, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 125000, 250000, 500000, 1000000];
-
 let quizData = [];
 let currentQuestion = 0;
 let score = 0;
@@ -245,46 +243,49 @@ function timeUp() {
     isAnswered = true;
     const buttons = document.querySelectorAll('.answer-btn');
     const correctIndex = quizData[currentQuestion].answers.findIndex(a => a.correct);
-    
+
     buttons.forEach(btn => btn.disabled = true);
     buttons[correctIndex].classList.add('correct');
-    
+
     setTimeout(() => {
-        showResults();
+        currentQuestion++;
+
+        if (currentQuestion < quizData.length) {
+            displayQuestion();
+        } else {
+            showResults();
+        }
     }, 2000);
 }
 
 function selectAnswer(index) {
     if (isAnswered) return;
     isAnswered = true;
-    
+
     clearInterval(timerInterval);
-    
+
     const buttons = document.querySelectorAll('.answer-btn');
     const correctIndex = quizData[currentQuestion].answers.findIndex(a => a.correct);
-    
+
     buttons.forEach(btn => btn.disabled = true);
-    
+
     if (quizData[currentQuestion].answers[index].correct) {
         buttons[index].classList.add('correct');
-        score = PRIZES[currentQuestion] || score;
-        
-        setTimeout(() => {
-            currentQuestion++;
-            if (currentQuestion < quizData.length) {
-                displayQuestion();
-            } else {
-                showResults();
-            }
-        }, 1500);
+        score++;
     } else {
         buttons[index].classList.add('wrong');
         buttons[correctIndex].classList.add('correct');
-        
-        setTimeout(() => {
-            showResults();
-        }, 2000);
     }
+
+    setTimeout(() => {
+        currentQuestion++;
+
+        if (currentQuestion < quizData.length) {
+            displayQuestion();
+        } else {
+            showResults();
+        }
+    }, 1500);
 }
 
 function use5050() {
@@ -339,13 +340,13 @@ function useCallFriend() {
     const correctIndex = quizData[currentQuestion].answers.findIndex(a => a.correct);
     const confidence = Math.floor(Math.random() * 30) + 60;
     
-    const friends = ["Johani", "Saraja", "Mike", "Emma", "Davidi"];
+    const friends = ["Baci", "Fjolla", "Liridoni", "Ema", "Dreniti"];
     const friend = friends[Math.floor(Math.random() * friends.length)];
     
-    document.getElementById('modalTitle').textContent = `📞 Thërre ${friend}`;
+    document.getElementById('modalTitle').textContent = `📞 Thirre ${friend}`;
     document.getElementById('modalBody').innerHTML = `
         <div class="friend-call">
-            "${friend} thotë: Jam ${confidence}% i sigurtë që përgjigja është 
+            "${friend} thotë: Jam ${confidence}% i sigurt që përgjigja është 
             <strong>${quizData[currentQuestion].answers[correctIndex].text}</strong>!"
         </div>
     `;
@@ -359,9 +360,9 @@ function closeModal() {
 function showResults() {
     clearInterval(timerInterval);
     showScreen('resultScreen');
-    document.getElementById('finalScore').textContent = `$${score.toLocaleString()}`;
+    document.getElementById('finalScore').textContent = `${score.toLocaleString()} pikë`;
     
-    const percentage = (score / (PRIZES[quizData.length - 1] || 1000)) * 100;
+    const percentage = (score / quizData.length) * 100;
     let message;
     
     if (percentage === 100) {
@@ -369,19 +370,22 @@ function showResults() {
         launchConfetti();
     } else if (percentage >= 70) {
         message = "🌟 Punë e shkëlqyer!";
+        launchConfetti();
     } else if (percentage >= 40) {
         message = "👍 Përpjekje e mirë!";
     } else if (score > 0) {
         message = "💪 Vijo të praktikosh!";
     } else {
-        message = "📚 Më shumë fat herën tjetër!";
+        message = "Më shumë fat herën tjetër... :(";
     }
     
     document.getElementById('resultMessage').textContent = message;
 }
 
 function shareResults() {
-    const text = `Unë arrita $${score.toLocaleString()} në kuizin Kush Do të Bëhet Milioner! A mund të më besh?`;
+    const percentage = Math.round((score / quizData.length) * 100);
+    const text = `Unë arrita ${percentage}% në Milioner Kuiz!`;
+
     if (navigator.share) {
         navigator.share({ text: text });
     } else {
